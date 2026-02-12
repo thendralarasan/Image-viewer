@@ -1,0 +1,29 @@
+.button-box {
+  background: #f3f3f3;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  border-radius: 6px;
+  margin: 40px 0;
+}
+
+.green-btn {
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.green-btn:hover {
+  background-color: #4cae4c;
+}
+
+.or-text {
+  color: #555;
+  font-weight: bold;
+}

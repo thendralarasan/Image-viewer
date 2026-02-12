@@ -1,0 +1,14 @@
+.home-page {
+  margin-left: 15%;            /* NORMAL = 15% */
+  width: calc(100% - 15%);
+  display: flex;
+  justify-content: center;
+
+  transition: margin-left 0.3s ease;
+}
+
+/* COLLAPSED */
+.home-page.collapsed {
+  margin-left: 5%;             /* COLLAPSED = 5% */
+  width: calc(100% - 5%);
+}
