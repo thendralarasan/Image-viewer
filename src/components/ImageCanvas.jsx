@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
   const [drawing, setDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState(null);
 
   const getMousePos = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -14,9 +15,10 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
 
   const handleMouseDown = (e) => {
     const activeArea = areas.find(a => a.active);
-    if (!activeArea) return;
+    if (!activeArea || !activeArea.shape) return;
 
     const pos = getMousePos(e);
+    setMousePos(pos);
 
     if (activeArea.shape === "rect" || activeArea.shape === "circle") {
       setStartPoint(pos);
@@ -78,10 +80,9 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
     setDrawing(false);
   };
 
-  // CLICK for POLYGON
   const handleClick = (e) => {
     const activeArea = areas.find(a => a.active);
-    if (!activeArea || activeArea.shape!== "poly") return;
+    if (!activeArea || activeArea.shape !== "poly") return;
 
     const pos = getMousePos(e);
 
@@ -99,7 +100,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
     );
   };
 
-  // DOUBLE CLICK → finish polygon
   const handleDoubleClick = () => {
     setDrawing(false);
   };
@@ -113,13 +113,17 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <img src={imageUrl} alt="preview" />
+      <img src={imageUrl} alt="preview" 
+           onError={(e)=>{
+            e.target.src =" ";
+            alert(" unable to load image . please use direct image URL.")
+           }}
+      />
 
       <svg className="svg-overlay">
         {areas.map(area => {
           if (!area.coords) return null;
 
-          // RECT
           if (area.shape === "rect") {
             const { x1, y1, x2, y2 } = area.coords;
             return (
@@ -136,7 +140,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
             );
           }
 
-          // CIRCLE
           if (area.shape === "circle") {
             const { cx, cy, r } = area.coords;
             return (
@@ -152,7 +155,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
             );
           }
 
-          // POLYGON
           if (area.shape === "poly" && Array.isArray(area.coords)) {
             const points = area.coords
               .map(p => `${p.x},${p.y}`)

@@ -9,18 +9,14 @@ import { generateImageMap } from "../utils/generateImageMap";
 const ImageSelector = () => {
   const fileInputRef = useRef(null);
 
-  // image states
   const [imageUrl, setImageUrl] = useState(null);
   const [webUrl, setWebUrl] = useState("");
 
-  // modal states
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
 
-  // generated code
   const [htmlCode, setHtmlCode] = useState("");
 
-  // areas state
   const [areas, setAreas] = useState([
     {
       id: 1,
@@ -31,9 +27,6 @@ const ImageSelector = () => {
       target: "",
     },
   ]);
-
-  /* ================= IMAGE HANDLERS ================= */
-
   const handleSelectFromPC = () => {
     fileInputRef.current.click();
   };
@@ -50,13 +43,10 @@ const ImageSelector = () => {
 
   const handleContinue = () => {
     if (!webUrl) return;
-    setImageUrl(webUrl);
+    setImageUrl(webUrl.trim());
     setWebUrl("");
     setShowLoadModal(false);
   };
-
-  /* ================= AREA HANDLERS ================= */
-
   const handleAddArea = () => {
     setAreas((prev) => [
       ...prev,
@@ -79,7 +69,6 @@ const ImageSelector = () => {
       }))
     );
   };
-
   const handleDeleteArea = (id) => {
     setAreas((prev) => {
       const filtered = prev.filter((area) => area.id !== id);
@@ -99,9 +88,6 @@ const ImageSelector = () => {
       )
     );
   };
-
-  /* ================= CODE GENERATION ================= */
-
   const handleShowCode = () => {
     if (!imageUrl || areas.length === 0) {
       alert("Please select an image and add at least one area");
@@ -112,18 +98,14 @@ const ImageSelector = () => {
     setHtmlCode(code);
     setShowCodeModal(true);
   };
-
-  /* ================= RENDER ================= */
-
   return (
     <div>
-      {/* Buttons */}
+      
       <ButtonGroup
         onSelectPC={handleSelectFromPC}
         onLoadFromWeb={handleLoadFromWeb}
       />
 
-      {/* Hidden file input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -131,8 +113,6 @@ const ImageSelector = () => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
-
-      {/* Load from web modal */}
       <LoadImagemodal
         isOpen={showLoadModal}
         onClose={() => setShowLoadModal(false)}
@@ -141,15 +121,12 @@ const ImageSelector = () => {
         setUrl={setWebUrl}
       />
 
-      {/* Code output modal */}
       {showCodeModal && (
         <CodeOutputModal
           code={htmlCode}
           onClose={() => setShowCodeModal(false)}
         />
       )}
-
-      {/* Image + controls */}
       {imageUrl && (
         <>
           <ImageCanvas
@@ -157,7 +134,6 @@ const ImageSelector = () => {
             areas={areas}
             setAreas={setAreas}
           />
-
           <AreaControls
             areas={areas}
             onAddArea={handleAddArea}
