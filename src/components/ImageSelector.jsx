@@ -7,14 +7,17 @@ import CodeOutputModal from "./CodeOutputModal";
 import { generateImageMap } from "../utils/generateImageMap";
 
 const ImageSelector = () => {
+
   const fileInputRef = useRef(null);
 
+ 
   const [imageUrl, setImageUrl] = useState(null);
   const [webUrl, setWebUrl] = useState("");
 
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
 
+  const [popupCoords, setPopupCoords] = useState(null);
   const [htmlCode, setHtmlCode] = useState("");
 
   const [areas, setAreas] = useState([
@@ -27,6 +30,8 @@ const ImageSelector = () => {
       target: "",
     },
   ]);
+
+
   const handleSelectFromPC = () => {
     fileInputRef.current.click();
   };
@@ -38,15 +43,19 @@ const ImageSelector = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImageUrl(URL.createObjectURL(file));
+
+    const objectUrl = URL.createObjectURL(file);
+    setImageUrl(objectUrl);
   };
 
   const handleContinue = () => {
     if (!webUrl) return;
+
     setImageUrl(webUrl.trim());
     setWebUrl("");
     setShowLoadModal(false);
   };
+
   const handleAddArea = () => {
     setAreas((prev) => [
       ...prev,
@@ -54,6 +63,7 @@ const ImageSelector = () => {
         id: prev.length + 1,
         active: false,
         shape: "",
+        coords: null,
         link: "",
         title: "",
         target: "",
@@ -69,8 +79,14 @@ const ImageSelector = () => {
       }))
     );
   };
+
   const handleDeleteArea = (id) => {
-    setAreas((prev) => {
+   setAreas((prev) => {
+    if (id ===1){
+      alert(" first area cannot be deleted");
+      return prev;
+    }
+    
       const filtered = prev.filter((area) => area.id !== id);
 
       if (filtered.length && !filtered.some((a) => a.active)) {
@@ -88,6 +104,9 @@ const ImageSelector = () => {
       )
     );
   };
+
+ 
+
   const handleShowCode = () => {
     if (!imageUrl || areas.length === 0) {
       alert("Please select an image and add at least one area");
@@ -98,14 +117,17 @@ const ImageSelector = () => {
     setHtmlCode(code);
     setShowCodeModal(true);
   };
+
   return (
     <div>
-      
+
+ 
       <ButtonGroup
         onSelectPC={handleSelectFromPC}
         onLoadFromWeb={handleLoadFromWeb}
       />
 
+     
       <input
         type="file"
         ref={fileInputRef}
@@ -113,6 +135,7 @@ const ImageSelector = () => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
+
       <LoadImagemodal
         isOpen={showLoadModal}
         onClose={() => setShowLoadModal(false)}
@@ -121,19 +144,25 @@ const ImageSelector = () => {
         setUrl={setWebUrl}
       />
 
+      
       {showCodeModal && (
         <CodeOutputModal
           code={htmlCode}
           onClose={() => setShowCodeModal(false)}
         />
       )}
+
       {imageUrl && (
         <>
           <ImageCanvas
             imageUrl={imageUrl}
             areas={areas}
             setAreas={setAreas}
+            onDrawComplete={setPopupCoords}
+            popupArea={popupCoords}
+            clearpopup={() => setPopupCoords(null)}
           />
+
           <AreaControls
             areas={areas}
             onAddArea={handleAddArea}
@@ -148,4 +177,4 @@ const ImageSelector = () => {
   );
 };
 
-export default ImageSelector;
+export default ImageSelector; 
