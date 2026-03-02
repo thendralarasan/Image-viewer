@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import CoordsPopup from "./CoordsPopup";
 
-const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , clearpopup }) => {
+const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
 
   const [drawing, setDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
@@ -16,16 +15,17 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       y: Math.round(e.clientY - rect.top),
     };
   };
+
   const handleMouseDown = (e) => {
     e.preventDefault();
     const pos = getMousePos(e);
+
 
     for (let area of areas) {
       if (!area.coords) continue;
 
       if (area.shape === "rect") {
         const { x1, y1, x2, y2 } = area.coords;
-
         const corners = [
           { x: x1, y: y1, corner: "tl" },
           { x: x2, y: y1, corner: "tr" },
@@ -46,6 +46,7 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
           }
         }
       }
+
       if (area.shape === "circle") {
         const { cx, cy, r } = area.coords;
         const dx = pos.x - (cx + r);
@@ -75,7 +76,9 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
           }
         }
       }
-    } 
+    }
+
+   
     for (let area of areas) {
       if (!area.coords) continue;
 
@@ -86,7 +89,12 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
         const top = Math.min(y1, y2);
         const bottom = Math.max(y1, y2);
 
-        if (pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom) {
+        if (
+          pos.x >= left &&
+          pos.x <= right &&
+          pos.y >= top &&
+          pos.y <= bottom
+        ) {
           setDraggingId(area.id);
           setDragStart(pos);
           return;
@@ -97,6 +105,7 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
         const { cx, cy, r } = area.coords;
         const dx = pos.x - cx;
         const dy = pos.y - cy;
+
         if (dx * dx + dy * dy <= r * r) {
           setDraggingId(area.id);
           setDragStart(pos);
@@ -105,12 +114,28 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       }
 
       if (area.shape === "poly" && Array.isArray(area.coords)) {
-        setDraggingId(area.id);
-        setDragStart(pos);
-        return;
+        const xs = area.coords.map(p => p.x);
+        const ys = area.coords.map(p => p.y);
+
+        const left = Math.min(...xs);
+        const right = Math.max(...xs);
+        const top = Math.min(...ys);
+        const bottom = Math.max(...ys);
+
+        if (
+          pos.x >= left &&
+          pos.x <= right &&
+          pos.y >= top &&
+          pos.y <= bottom
+        ) {
+          setDraggingId(area.id);
+          setDragStart(pos);
+          return;
+        }
       }
     }
 
+   
     const activeArea = areas.find(a => a.active);
     if (!activeArea || !activeArea.shape) return;
 
@@ -133,56 +158,10 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       );
     }
   };
+
   const handleMouseMove = (e) => {
     const pos = getMousePos(e);
-    if (resizeData) {
-      setAreas(prev =>
-        prev.map(area => {
-          if (area.id !== resizeData.id) return area;
 
-          if (resizeData.type === "rect") {
-            let { x1, y1, x2, y2 } = area.coords;
-
-            if (resizeData.corner === "tl") {
-              x1 = pos.x;
-              y1 = pos.y;
-            }
-            if (resizeData.corner === "tr") {
-              x2 = pos.x;
-              y1 = pos.y;
-            }
-            if (resizeData.corner === "bl") {
-              x1 = pos.x;
-              y2 = pos.y;
-            }
-            if (resizeData.corner === "br") {
-              x2 = pos.x;
-              y2 = pos.y;
-            }
-
-            return { ...area, coords: { x1, y1, x2, y2 } };
-          }
-
-          if (resizeData.type === "circle") {
-            const dx = pos.x - area.coords.cx;
-            const dy = pos.y - area.coords.cy;
-            const r = Math.sqrt(dx * dx + dy * dy);
-
-            return { ...area, coords: { ...area.coords, r } };
-          }
-
-          if (resizeData.type === "poly") {
-            const newCoords = [...area.coords];
-            newCoords[resizeData.index] = pos;
-
-            return { ...area, coords: newCoords };
-          }
-
-          return area;
-        })
-      );
-      return;
-    }
 
     if (draggingId) {
       const dx = pos.x - dragStart.x;
@@ -232,6 +211,57 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       setDragStart(pos);
       return;
     }
+
+    // ---------- RESIZE ----------
+if (resizeData) {
+  setAreas(prev =>
+    prev.map(area => {
+      if (area.id !== resizeData.id) return area;
+
+      if (resizeData.type === "rect") {
+        let { x1, y1, x2, y2 } = area.coords;
+
+        if (resizeData.corner === "tl") {
+          x1 = pos.x;
+          y1 = pos.y;
+        }
+        if (resizeData.corner === "tr") {
+          x2 = pos.x;
+          y1 = pos.y;
+        }
+        if (resizeData.corner === "bl") {
+          x1 = pos.x;
+          y2 = pos.y;
+        }
+        if (resizeData.corner === "br") {
+          x2 = pos.x;
+          y2 = pos.y;
+        }
+
+        return { ...area, coords: { x1, y1, x2, y2 } };
+      }
+
+      if (resizeData.type === "circle") {
+        const dx = pos.x - area.coords.cx;
+        const dy = pos.y - area.coords.cy;
+        const r = Math.sqrt(dx * dx + dy * dy);
+
+        return { ...area, coords: { ...area.coords, r } };
+      }
+
+      if (resizeData.type === "poly") {
+        const newCoords = [...area.coords];
+        newCoords[resizeData.index] = pos;
+        return { ...area, coords: newCoords };
+      }
+
+      return area;
+    })
+  );
+  return;
+}
+
+   
     if (!drawing) return;
 
     setAreas(prev =>
@@ -264,27 +294,16 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       })
     );
   };
+
   const handleMouseUp = () => {
-
-    const activeArea = areas.find(a => a.active);
-     if(
-        activeArea &&
-        activeArea.coords &&
-        (drawing || draggingId || resizeData)
-     ){
-      if(onDrawComplete){
-      onDrawComplete({...activeArea});
-     }
-    }
-
     setDrawing(false);
     setDraggingId(null);
     setResizeData(null);
   };
+
   const handleClick = (e) => {
     const activeArea = areas.find(a => a.active);
     if (!activeArea || activeArea.shape !== "poly") return;
-    if (e.detail === 2) return;
 
     const pos = getMousePos(e);
 
@@ -301,17 +320,15 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       )
     );
   };
+
   return (
     <div
       className="image-preview"
       style={{
-        cursor: resizeData
-          ? "nwse-resize"
-          : draggingId
-          ? "move"
-          : areas.some(a => a.active)
-          ? "crosshair"
-          : "default",
+        cursor:
+          draggingId || resizeData || areas.some(a => a.active)
+            ? "pointer"
+            : "default",
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -319,13 +336,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
       onClick={handleClick}
     >
       <img src={imageUrl} alt="preview" draggable={false} />
-
-      {popupArea &&(
-        <CoordsPopup 
-          area={popupArea}
-          onClose={clearpopup}
-        />
-      )}
 
       <svg className="svg-overlay">
         {areas.map(area => {
@@ -339,56 +349,44 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
             const height = Math.abs(y2 - y1);
 
             return (
-              <g key={area.id}>
-                <rect
-                  x={left}
-                  y={top}
-                  width={width}
-                  height={height}
-                  fill="rgba(30,144,255,0.25)"
-                  stroke="#1e90ff"
-                  strokeWidth="2"
-                />
-                <circle cx={x1} cy={y1} r="5" fill="#1e90ff" />
-                <circle cx={x2} cy={y1} r="5" fill="#1e90ff" />
-                <circle cx={x1} cy={y2} r="5" fill="#1e90ff" />
-                <circle cx={x2} cy={y2} r="5" fill="#1e90ff" />
-              </g>
+              <rect
+                key={area.id}
+                x={left}
+                y={top}
+                width={width}
+                height={height}
+                fill="rgba(30,144,255,0.25)"
+                stroke="#1e90ff"
+              />
             );
           }
 
           if (area.shape === "circle") {
             const { cx, cy, r } = area.coords;
             return (
-              <g key={area.id}>
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={r}
-                  fill="rgba(46,204,113,0.25)"
-                  stroke="#2ecc71"
-                  strokeWidth="2"
-                />
-                <circle cx={cx + r} cy={cy} r="5" fill="#2ecc71" />
-              </g>
+              <circle
+                key={area.id}
+                cx={cx}
+                cy={cy}
+                r={r}
+                fill="rgba(46,204,113,0.25)"
+                stroke="#2ecc71"
+              />
             );
           }
 
           if (area.shape === "poly" && Array.isArray(area.coords)) {
-            const points = area.coords.map((p) => `${p.x},${p.y}`).join(" ");
+            const points = area.coords
+              .map(p => `${p.x},${p.y}`)
+              .join(" ");
 
             return (
-              <g key={area.id}>
-                <polygon
-                  points={points}
-                  fill="rgba(241,196,15,0.25)"
-                  stroke="#f1c40f"
-                  strokeWidth="2"
-                />
-                {area.coords.map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r="5" fill="#f1c40f" />
-                ))}
-              </g>
+              <polygon
+                key={area.id}
+                points={points}
+                fill="rgba(241,196,15,0.25)"
+                stroke="#f1c40f"
+              />
             );
           }
 
@@ -398,4 +396,5 @@ const ImageCanvas = ({ imageUrl, areas, setAreas, onDrawComplete , popupArea , c
     </div>
   );
 };
+
 export default ImageCanvas;

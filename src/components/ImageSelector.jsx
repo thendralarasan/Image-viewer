@@ -5,19 +5,18 @@ import AreaControls from "./AreaControls";
 import ImageCanvas from "./ImageCanvas";
 import CodeOutputModal from "./CodeOutputModal";
 import { generateImageMap } from "../utils/generateImageMap";
+import CoordsValueBox from "./CoordsValueBox";
 
 const ImageSelector = () => {
 
   const fileInputRef = useRef(null);
 
- 
   const [imageUrl, setImageUrl] = useState(null);
   const [webUrl, setWebUrl] = useState("");
 
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
 
-  const [popupCoords, setPopupCoords] = useState(null);
   const [htmlCode, setHtmlCode] = useState("");
 
   const [areas, setAreas] = useState([
@@ -25,12 +24,12 @@ const ImageSelector = () => {
       id: 1,
       active: true,
       shape: "rect",
+      coords: null,
       link: "",
       title: "",
       target: "",
     },
   ]);
-
 
   const handleSelectFromPC = () => {
     fileInputRef.current.click();
@@ -43,24 +42,21 @@ const ImageSelector = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    const objectUrl = URL.createObjectURL(file);
-    setImageUrl(objectUrl);
+    setImageUrl(URL.createObjectURL(file));
   };
 
   const handleContinue = () => {
     if (!webUrl) return;
-
     setImageUrl(webUrl.trim());
     setWebUrl("");
     setShowLoadModal(false);
   };
 
   const handleAddArea = () => {
-    setAreas((prev) => [
+    setAreas(prev => [
       ...prev,
       {
-        id: prev.length + 1,
+        id: Date.now(),
         active: false,
         shape: "",
         coords: null,
@@ -72,8 +68,8 @@ const ImageSelector = () => {
   };
 
   const handleSetActive = (id) => {
-    setAreas((prev) =>
-      prev.map((area) => ({
+    setAreas(prev =>
+      prev.map(area => ({
         ...area,
         active: area.id === id,
       }))
@@ -81,31 +77,25 @@ const ImageSelector = () => {
   };
 
   const handleDeleteArea = (id) => {
-   setAreas((prev) => {
-    if (id ===1){
-      alert(" first area cannot be deleted");
-      return prev;
-    }
-    
-      const filtered = prev.filter((area) => area.id !== id);
+    setAreas(prev => {
+      if (!Array.isArray(prev) || prev.length === 0) return prev;
 
-      if (filtered.length && !filtered.some((a) => a.active)) {
-        filtered[0] = { ...filtered[0], active: true };
-      }
+      const areaToDelete = prev.find(a => a.id === id);
 
-      return filtered;
+      
+      if (areaToDelete?.active) return prev;
+
+      return prev.filter(a => a.id !== id);
     });
   };
 
   const handleAreaChange = (id, field, value) => {
-    setAreas((prev) =>
-      prev.map((area) =>
+    setAreas(prev =>
+      prev.map(area =>
         area.id === id ? { ...area, [field]: value } : area
       )
     );
   };
-
- 
 
   const handleShowCode = () => {
     if (!imageUrl || areas.length === 0) {
@@ -120,14 +110,11 @@ const ImageSelector = () => {
 
   return (
     <div>
-
- 
       <ButtonGroup
         onSelectPC={handleSelectFromPC}
         onLoadFromWeb={handleLoadFromWeb}
       />
 
-     
       <input
         type="file"
         ref={fileInputRef}
@@ -144,7 +131,6 @@ const ImageSelector = () => {
         setUrl={setWebUrl}
       />
 
-      
       {showCodeModal && (
         <CodeOutputModal
           code={htmlCode}
@@ -154,13 +140,11 @@ const ImageSelector = () => {
 
       {imageUrl && (
         <>
+        <CoordsValueBox areas={areas}/>
           <ImageCanvas
             imageUrl={imageUrl}
             areas={areas}
             setAreas={setAreas}
-            onDrawComplete={setPopupCoords}
-            popupArea={popupCoords}
-            clearpopup={() => setPopupCoords(null)}
           />
 
           <AreaControls
@@ -177,4 +161,4 @@ const ImageSelector = () => {
   );
 };
 
-export default ImageSelector; 
+export default ImageSelector;

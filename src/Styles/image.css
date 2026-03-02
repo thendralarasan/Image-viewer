@@ -1,9 +1,9 @@
 
-
 .image-preview {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  position: relative;
 }
 
 .image-preview img {
@@ -32,8 +32,6 @@
 .area-header span {
   white-space: nowrap;
 }
-
-
 .area-row {
   display: grid;
   grid-template-columns: 40px 100px 1fr 1fr 120px 40px;
@@ -45,18 +43,13 @@
   border-radius: 6px;
   transition: background 0.2s ease;
 }
-
-
 .area-row:hover {
   background: #f9fbff;
 }
-
-
 .area-row:has(input[type="radio"]:checked) {
   background: #f0f7ff;
   border: 1px solid #cfe3ff;
 }
-
 .area-row input,
 .area-row select {
   width: 100%;
@@ -66,15 +59,11 @@
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-
 .area-row input:focus,
 .area-row select:focus {
   border-color: #1e90ff;
   box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
 }
-
-
 .delete-btn {
   background: #eee;
   border: 1px solid #ccc;
@@ -84,20 +73,17 @@
   border-radius: 4px;
 }
 
+
 .delete-btn:hover {
   background: #ffecec;
   border-color: #ff4d4f;
   color: #ff4d4f;
 }
-
-
-
 .area-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
 }
-
 .add-btn {
   background: #e74c3c;
   color: #fff;
@@ -110,8 +96,6 @@
 .add-btn:hover {
   background: #d63b2b;
 }
-
-
 .code-btn-wrapper {
   display: flex;
   justify-content: center;
@@ -226,7 +210,7 @@
   gap: 10px;
   margin-top: 12px;
 }
-/* ===== Code Output Modal ===== */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -236,7 +220,6 @@
   justify-content: center;
   z-index: 9999;
 }
-
 .modal-box {
   background: #fff;
   width: 80%;
@@ -254,7 +237,6 @@
   font-size: 20px;
   font-weight: 600;
 }
-
 .modal-box textarea {
   flex: 1;
   width: 100%;
@@ -273,7 +255,6 @@
   gap: 10px;
   margin-top: 15px;
 }
-
 .modal-actions button {
   padding: 8px 16px;
   border-radius: 6px;
