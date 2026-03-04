@@ -11,10 +11,9 @@ const formatCoords = (area) => {
     return `${cx},${cy},${r}`;
   }
 
-  // ✅ Improved poly handling
+  
   if (area.shape === "poly" && Array.isArray(area.coords)) {
 
-    // Minimum 3 points required
     if (area.coords.length < 3) return "";
 
     return area.coords
@@ -44,7 +43,7 @@ export const generateImageMap = (imageUrl, areas) => {
   target="${a.target || ''}"
 />`;
     })
-    .filter(Boolean)   // remove empty results safely
+    .filter(Boolean)   
     .join("\n");
 
   return `<!-- Image Map Generated -->

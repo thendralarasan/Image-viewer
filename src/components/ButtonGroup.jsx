@@ -8,10 +8,11 @@ const ButtonGroup = ({ onSelectPC, onLoadFromWeb }) => {
       </button>
 
       <span className='or-text'>--or--</span>
-
+     
       <button className='green-btn' onClick={onLoadFromWeb}>
         Load Image from Website
       </button>
+      
     </div>
   )
 }

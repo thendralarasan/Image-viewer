@@ -22,7 +22,6 @@ const CoordsValueBox = ({ areas }) => {
         .join(",");
     }
   }
-
   const handleCopy = () => {
     if (!coordsString) return;
     navigator.clipboard.writeText(coordsString);

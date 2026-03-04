@@ -46,7 +46,7 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
           }
         }
       }
-
+      
       if (area.shape === "circle") {
         const { cx, cy, r } = area.coords;
         const dx = pos.x - (cx + r);
@@ -60,7 +60,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
           return;
         }
       }
-
       if (area.shape === "poly" && Array.isArray(area.coords)) {
         for (let i = 0; i < area.coords.length; i++) {
           const p = area.coords[i];
@@ -77,11 +76,8 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
         }
       }
     }
-
-   
     for (let area of areas) {
       if (!area.coords) continue;
-
       if (area.shape === "rect") {
         const { x1, y1, x2, y2 } = area.coords;
         const left = Math.min(x1, x2);
@@ -135,7 +131,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
       }
     }
 
-   
     const activeArea = areas.find(a => a.active);
     if (!activeArea || !activeArea.shape) return;
 
@@ -212,7 +207,6 @@ const ImageCanvas = ({ imageUrl, areas, setAreas }) => {
       return;
     }
 
-    // ---------- RESIZE ----------
 if (resizeData) {
   setAreas(prev =>
     prev.map(area => {
@@ -240,7 +234,6 @@ if (resizeData) {
 
         return { ...area, coords: { x1, y1, x2, y2 } };
       }
-
       if (resizeData.type === "circle") {
         const dx = pos.x - area.coords.cx;
         const dy = pos.y - area.coords.cy;
@@ -248,7 +241,6 @@ if (resizeData) {
 
         return { ...area, coords: { ...area.coords, r } };
       }
-
       if (resizeData.type === "poly") {
         const newCoords = [...area.coords];
         newCoords[resizeData.index] = pos;
@@ -260,10 +252,7 @@ if (resizeData) {
   );
   return;
 }
-
-   
     if (!drawing) return;
-
     setAreas(prev =>
       prev.map(area => {
         if (!area.active || !area.coords) return area;
@@ -279,7 +268,6 @@ if (resizeData) {
             },
           };
         }
-
         if (area.shape === "circle") {
           const dx = pos.x - startPoint.x;
           const dy = pos.y - startPoint.y;
@@ -289,24 +277,19 @@ if (resizeData) {
             coords: { cx: startPoint.x, cy: startPoint.y, r },
           };
         }
-
         return area;
       })
     );
   };
-
   const handleMouseUp = () => {
     setDrawing(false);
     setDraggingId(null);
     setResizeData(null);
   };
-
   const handleClick = (e) => {
     const activeArea = areas.find(a => a.active);
     if (!activeArea || activeArea.shape !== "poly") return;
-
     const pos = getMousePos(e);
-
     setAreas(prev =>
       prev.map(area =>
         area.active
@@ -320,7 +303,6 @@ if (resizeData) {
       )
     );
   };
-
   return (
     <div
       className="image-preview"
@@ -336,18 +318,15 @@ if (resizeData) {
       onClick={handleClick}
     >
       <img src={imageUrl} alt="preview" draggable={false} />
-
       <svg className="svg-overlay">
         {areas.map(area => {
           if (!area.coords) return null;
-
           if (area.shape === "rect") {
             const { x1, y1, x2, y2 } = area.coords;
             const left = Math.min(x1, x2);
             const top = Math.min(y1, y2);
             const width = Math.abs(x2 - x1);
             const height = Math.abs(y2 - y1);
-
             return (
               <rect
                 key={area.id}
@@ -360,7 +339,6 @@ if (resizeData) {
               />
             );
           }
-
           if (area.shape === "circle") {
             const { cx, cy, r } = area.coords;
             return (
@@ -389,12 +367,10 @@ if (resizeData) {
               />
             );
           }
-
           return null;
         })}
       </svg>
     </div>
   );
 };
-
 export default ImageCanvas;

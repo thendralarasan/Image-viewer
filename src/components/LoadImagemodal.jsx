@@ -10,7 +10,7 @@ const LoadImageModal = ({ isOpen, onClose, onContinue, url, setUrl }) => {
           <h3>Load Image from Website</h3>
           <span className="close-icon" onClick={onClose}>×</span>
         </div>
-
+        
         <input
           type="text"
           placeholder="http://..."
